@@ -1,4 +1,8 @@
 package co.istad.identity.features.role;
 
-public interface RoleRepository {
+import co.istad.identity.domain.Role;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface RoleRepository extends JpaRepository<Role, Long> {
+    Role findByName(String name);
 }

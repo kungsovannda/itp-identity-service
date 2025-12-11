@@ -1,4 +1,4 @@
 package co.istad.identity.features.user;
 
-public interface UserServiceImpl {
+public class UserServiceImpl implements UserService {
 }
