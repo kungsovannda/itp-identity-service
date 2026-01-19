@@ -64,4 +64,9 @@ public class SecurityConfig {
         return http.build();
     }
 
-}
+    @Bean
+    public AuthorizationServerSettings authorizationServerSettings() {
+        return AuthorizationServerSettings.builder()
+                .issuer(issuerUri)
+                .build();
+    }
