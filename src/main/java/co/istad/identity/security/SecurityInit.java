@@ -51,4 +51,50 @@ public class SecurityInit {
             userRepository.save(user);
         }
     }
+
+    @PostConstruct
+    public void initClient() {
+        if (jpaRegisteredClientRepository.findByClientId("itp-standard") == null) {
+            TokenSettings tokenSettings = TokenSettings.builder()
+                    .accessTokenFormat(OAuth2TokenFormat.SELF_CONTAINED)
+                    .accessTokenTimeToLive(Duration.ofDays(3))
+                    .reuseRefreshTokens(false)
+                    .refreshTokenTimeToLive(Duration.ofDays(5))
+                    .build();
+
+            ClientSettings clientSettings = ClientSettings.builder()
+                    .requireProofKey(true)
+                    .requireAuthorizationConsent(false)
+                    .build();
+
+            var client = RegisteredClient.withId(UUID.randomUUID().toString())
+                    .clientId("itp-standard")
+                    .clientName("ITP Standard")
+                    .clientSecret(passwordEncoder.encode("secret"))
+                    .clientSettings(clientSettings)
+                    .tokenSettings(tokenSettings)
+                    .authorizationGrantTypes(auth -> {
+                        auth.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+                        auth.add(AuthorizationGrantType.REFRESH_TOKEN);
+                        auth.add(AuthorizationGrantType.CLIENT_CREDENTIALS);
+                    })
+                    .clientAuthenticationMethods(auth -> {
+                        auth.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+                    })
+                    .clientIdIssuedAt(Instant.now())
+                    .postLogoutRedirectUri("http://localhost:9090")
+                    .redirectUris(uri -> {
+                                uri.add("http://localhost:9090/login/oauth2/code/itp-standard");
+                            }
+                    )
+                    .scopes(scope -> {
+                                scope.add(OidcScopes.OPENID);
+                                scope.add(OidcScopes.EMAIL);
+                                scope.add(OidcScopes.PROFILE);
+                            }
+                    )
+                    .build();
+            jpaRegisteredClientRepository.save(client);
+        }
+    }
 }
