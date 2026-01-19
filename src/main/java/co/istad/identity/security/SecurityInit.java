@@ -96,14 +96,13 @@ public class SecurityInit {
                     .postLogoutRedirectUri("http://localhost:9090")
                     .redirectUris(uri -> {
                                 uri.add("http://localhost:9090/login/oauth2/code/itp-standard");
-                            }
-                    )
+                                uri.add("http://localhost:9999/login/oauth2/code/itp-standard");
+                    })
                     .scopes(scope -> {
                                 scope.add(OidcScopes.OPENID);
                                 scope.add(OidcScopes.EMAIL);
                                 scope.add(OidcScopes.PROFILE);
-                            }
-                    )
+                    })
                     .build();
             jpaRegisteredClientRepository.save(client);
         }
