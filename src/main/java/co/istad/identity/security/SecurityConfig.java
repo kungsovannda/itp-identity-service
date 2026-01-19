@@ -24,10 +24,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http.authorizeHttpRequests(auth ->
-                auth.requestMatchers("/public/**").permitAll()
-                        .anyRequest().authenticated()
-        );
+                http
+                        .securityMatcher(authorizationServerConfigurer.getEndpointsMatcher())
+                        .with(authorizationServerConfigurer, (authorizationServer) ->
+                                authorizationServer
+                                        .oidc(Customizer.withDefaults())	// Enable OpenID Connect 1.0
+                        )
+                        .authorizeHttpRequests((authorize) ->
+                                authorize
+                                        .anyRequest().authenticated()
+                        )
+                        // Redirect to the login page when not authenticated from the
+                        // authorization endpoint
+                        .exceptionHandling((exceptions) -> exceptions
+                                .defaultAuthenticationEntryPointFor(
+                                        new LoginUrlAuthenticationEntryPoint("/login"),
+                                        new MediaTypeRequestMatcher(MediaType.TEXT_HTML)
+                                )
+                        );
 
         http.formLogin(Customizer.withDefaults());
         http.httpBasic(Customizer.withDefaults());
