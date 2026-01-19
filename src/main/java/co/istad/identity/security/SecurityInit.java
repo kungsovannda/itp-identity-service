@@ -2,13 +2,23 @@ package co.istad.identity.security;
 
 import co.istad.identity.domain.Role;
 import co.istad.identity.domain.User;
+import co.istad.identity.features.oauth2.JpaRegisteredClientRepository;
 import co.istad.identity.features.role.RoleRepository;
 import co.istad.identity.features.user.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.security.oauth2.core.oidc.OidcScopes;
+import org.springframework.security.oauth2.server.authorization.client.RegisteredClient;
+import org.springframework.security.oauth2.server.authorization.settings.ClientSettings;
+import org.springframework.security.oauth2.server.authorization.settings.OAuth2TokenFormat;
+import org.springframework.security.oauth2.server.authorization.settings.TokenSettings;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.HashSet;
@@ -22,6 +32,7 @@ public class SecurityInit {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final JpaRegisteredClientRepository jpaRegisteredClientRepository;
 
     @PostConstruct
     public void init() {
