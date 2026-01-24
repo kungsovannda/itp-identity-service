@@ -45,6 +45,9 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         this.registeredClientRepository = registeredClientRepository;
 
         ClassLoader classLoader = JpaOAuth2AuthorizationService.class.getClassLoader();
+        BasicPolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfBaseType(CustomUserDetails.class)
+                .build();
         this.objectMapper = JsonMapper.builder()
                 .addModules(SecurityJacksonModules.getModules(classLoader))
                 .addModule(new OAuth2AuthorizationServerJacksonModule())
