@@ -2,7 +2,11 @@ package co.istad.identity.security;
 
 import co.istad.identity.domain.Permission;
 import co.istad.identity.domain.Role;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,8 +14,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class CustomUserDetails implements UserDetails {
 
     private final String uuid;
@@ -43,12 +51,30 @@ public class CustomUserDetails implements UserDetails {
     private final Boolean credentialsNonExpired;
 
     private final Boolean isEnabled;
-    
-    private final Set<Role> roles;
-    
-    private final Set<Permission> permissions;
 
-    public CustomUserDetails( String uuid, String username, String email, String password, String familyName, String givenName, String phoneNumber, String gender, LocalDate dob, String profileImage, String coverImage, Boolean accountNonExpired, Boolean accountNonLocked, Boolean credentialsNonExpired, Boolean isEnabled, Set<Role> roles, Set<Permission> permissions) {
+    private final Set<String> roles;
+
+    private final Set<String> permissions;
+
+    public CustomUserDetails(
+            @JsonProperty("uuid") String uuid,
+            @JsonProperty("username") String username,
+            @JsonProperty("email") String email,
+            @JsonProperty("password") String password,
+            @JsonProperty("familyName") String familyName,
+            @JsonProperty("givenName") String givenName,
+            @JsonProperty("phoneNumber") String phoneNumber,
+            @JsonProperty("gender") String gender,
+            @JsonProperty("dob") LocalDate dob,
+            @JsonProperty("profileImage") String profileImage,
+            @JsonProperty("coverImage") String coverImage,
+            @JsonProperty("accountNonExpired") Boolean accountNonExpired,
+            @JsonProperty("accountNonLocked") Boolean accountNonLocked,
+            @JsonProperty("credentialsNonExpired") Boolean credentialsNonExpired,
+            @JsonProperty("isEnabled") Boolean isEnabled,
+            @JsonProperty("roles") Set<String> roles,
+            @JsonProperty("permission") Set<String> permissions
+    ) {
         this.uuid = uuid;
         this.username = username;
         this.email = email;
@@ -75,11 +101,44 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public @Nullable String getPassword() {
-        return "";
+        return this.password;
     }
 
     @Override
     public String getUsername() {
-        return "";
+        return this.username;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CustomUserDetails that = (CustomUserDetails) o;
+        return Objects.equals(getUsername(), that.getUsername()); // Compare based on a unique field
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUsername()); // Hash based on the same unique field
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return this.accountNonExpired;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return this.accountNonLocked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return this.credentialsNonExpired;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return this.isEnabled;
     }
 }
