@@ -104,7 +104,58 @@ public class SecurityInit {
                                 scope.add(OidcScopes.PROFILE);
                     })
                     .build();
+
+
+            var frontBff = RegisteredClient.withId(UUID.randomUUID().toString())
+                    .clientId("itp-frontbff")
+                    .clientName("ITP Front BFF")
+                    .clientSecret(passwordEncoder.encode("secret"))
+                    .clientSettings(clientSettings)
+                    .tokenSettings(tokenSettings)
+                    .authorizationGrantTypes(auth -> {
+                        auth.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+                    })
+                    .clientAuthenticationMethods(auth -> {
+                        auth.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+                    })
+                    .clientIdIssuedAt(Instant.now())
+                    .postLogoutRedirectUri("http://localhost:9990")
+                    .redirectUris(uri -> {
+                        uri.add("http://localhost:9990/login/oauth2/code/itp-frontbff");
+                    })
+                    .scopes(scope -> {
+                        scope.add(OidcScopes.OPENID);
+                        scope.add(OidcScopes.EMAIL);
+                        scope.add(OidcScopes.PROFILE);
+                    })
+                    .build();
+
+            var adminBff = RegisteredClient.withId(UUID.randomUUID().toString())
+                    .clientId("itp-adminbff")
+                    .clientName("ITP Admin BFF")
+                    .clientSecret(passwordEncoder.encode("secret"))
+                    .clientSettings(clientSettings)
+                    .tokenSettings(tokenSettings)
+                    .authorizationGrantTypes(auth -> {
+                        auth.add(AuthorizationGrantType.AUTHORIZATION_CODE);
+                    })
+                    .clientAuthenticationMethods(auth -> {
+                        auth.add(ClientAuthenticationMethod.CLIENT_SECRET_BASIC);
+                    })
+                    .clientIdIssuedAt(Instant.now())
+                    .postLogoutRedirectUri("http://localhost:9991")
+                    .redirectUris(uri -> {
+                        uri.add("http://localhost:9991/login/oauth2/code/itp-adminbff");
+                    })
+                    .scopes(scope -> {
+                        scope.add(OidcScopes.OPENID);
+                        scope.add(OidcScopes.EMAIL);
+                        scope.add(OidcScopes.PROFILE);
+                    })
+                    .build();
             jpaRegisteredClientRepository.save(client);
+            jpaRegisteredClientRepository.save(frontBff);
+            jpaRegisteredClientRepository.save(adminBff);
         }
     }
 }
