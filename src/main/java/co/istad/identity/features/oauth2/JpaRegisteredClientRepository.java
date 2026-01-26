@@ -1,6 +1,7 @@
 package co.istad.identity.features.oauth2;
 
 import co.istad.identity.domain.Client;
+import co.istad.identity.security.CustomUserDetails;
 import org.springframework.security.jackson.SecurityJacksonModules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
@@ -15,6 +16,8 @@ import org.springframework.util.StringUtils;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,9 +33,12 @@ public class JpaRegisteredClientRepository implements RegisteredClientRepository
         Assert.notNull(clientRepository, "clientRepository cannot be null");
         this.clientRepository = clientRepository;
         ClassLoader classLoader = JpaRegisteredClientRepository.class.getClassLoader();
+        BasicPolymorphicTypeValidator.Builder typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType(Object.class)
+                .allowIfBaseType(CustomUserDetails.class);
 
         this.objectMapper = JsonMapper.builder()
-                .addModules(SecurityJacksonModules.getModules(classLoader))
+                .addModules(SecurityJacksonModules.getModules(classLoader, typeValidator))
                 .addModule(new OAuth2AuthorizationServerJacksonModule())
                 .build();
     }
