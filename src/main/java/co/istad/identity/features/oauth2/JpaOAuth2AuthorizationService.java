@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 
 import co.istad.identity.domain.Authorization;
+import co.istad.identity.security.CustomUserDetails;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.security.jackson.SecurityJacksonModules;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
@@ -31,6 +32,8 @@ import org.springframework.util.StringUtils;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 
 @Component
 public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService {
@@ -45,11 +48,12 @@ public class JpaOAuth2AuthorizationService implements OAuth2AuthorizationService
         this.registeredClientRepository = registeredClientRepository;
 
         ClassLoader classLoader = JpaOAuth2AuthorizationService.class.getClassLoader();
-        BasicPolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
-                .allowIfBaseType(CustomUserDetails.class)
-                .build();
+        BasicPolymorphicTypeValidator.Builder typeValidator = BasicPolymorphicTypeValidator.builder()
+                .allowIfSubType(Object.class)
+                .allowIfBaseType(CustomUserDetails.class);
+
         this.objectMapper = JsonMapper.builder()
-                .addModules(SecurityJacksonModules.getModules(classLoader))
+                .addModules(SecurityJacksonModules.getModules(classLoader, typeValidator))
                 .addModule(new OAuth2AuthorizationServerJacksonModule())
                 .build();
     }
