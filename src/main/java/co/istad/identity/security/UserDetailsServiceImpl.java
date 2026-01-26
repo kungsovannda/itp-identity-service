@@ -1,5 +1,7 @@
 package co.istad.identity.security;
 
+import co.istad.identity.domain.Permission;
+import co.istad.identity.domain.Role;
 import co.istad.identity.domain.User;
 import co.istad.identity.features.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -37,14 +40,34 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         log.info("USER AUTHORITIES: {}", authorities);
 
-        return org.springframework.security.core.userdetails.User.withUsername(user.getUsername())
-                .disabled(!user.getIsEnabled())
-                .credentialsExpired(!user.getCredentialsNonExpired())
-                .accountLocked(!user.getAccountNonLocked())
-                .accountExpired(!user.getAccountNonExpired())
-//                .roles(user.getRoles().stream().map(Role::getName).toArray(String[]::new))
-                .authorities(authorities)
-                .password(user.getPassword())
-                .build();
+//        return org.springframework.security.core.userdetails.User.withUsername(user.getUsername())
+//                .disabled(!user.getIsEnabled())
+//                .credentialsExpired(!user.getCredentialsNonExpired())
+//                .accountLocked(!user.getAccountNonLocked())
+//                .accountExpired(!user.getAccountNonExpired())
+////                .roles(user.getRoles().stream().map(Role::getName).toArray(String[]::new))
+//                .authorities(authorities)
+//                .password(user.getPassword())
+//                .build();
+
+        return new CustomUserDetails(
+                user.getUuid(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getPassword(),
+                user.getFamilyName(),
+                user.getGivenName(),
+                user.getPhoneNumber(),
+                user.getGender(),
+                user.getDob(),
+                user.getProfileImage(),
+                user.getCoverImage(),
+                user.getAccountNonExpired(),
+                user.getAccountNonLocked(),
+                user.getCredentialsNonExpired(),
+                user.getIsEnabled(),
+                user.getRoles().stream().map(Role::getName).collect(Collectors.toSet()),
+                user.getPermissions().stream().map(Permission::getName).collect(Collectors.toSet())
+        );
     }
 }
