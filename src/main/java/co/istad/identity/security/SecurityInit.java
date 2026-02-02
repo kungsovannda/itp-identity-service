@@ -43,7 +43,7 @@ public class SecurityInit {
             user.setPassword(passwordEncoder.encode("password"));
             user.setDob(LocalDate.of(2006, Month.NOVEMBER, 18));
             user.setEmail("kungsovannda@gmail.com");
-            user.setCoverImage("placeholder.jpg");
+            user.setCoverImage("https://i.pinimg.com/736x/00/a5/c1/00a5c1587438846dd7cdf7f75a06b925.jpg");
             user.setGender("Male");
             user.setFamilyName("Kung");
             user.setGivenName("Sovannda");
