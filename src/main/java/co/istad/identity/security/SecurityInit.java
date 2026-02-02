@@ -52,7 +52,7 @@ public class SecurityInit {
             user.setAccountNonLocked(true);
             user.setCredentialsNonExpired(true);
             user.setPhoneNumber("+85516797411");
-            user.setProfileImage("placeholder.jpg");
+            user.setProfileImage("https://i.pinimg.com/736x/07/38/5f/07385f7fb818f5edd361961d8242a6c3.jpg");
 
             Set<Role> roles = new HashSet<>();
             roles.add(roleRepository.findByName("ADMIN"));
